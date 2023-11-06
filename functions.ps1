@@ -15,24 +15,29 @@ $snakeHeadLocations = $board | Where-Object { $_.'Type' -eq 'Snake Head' } | Sel
 
 while ($playerLocation -lt 100) {
 
-    [int]$playerRoll = Invoke-Role
+    [int]$playerRoll = Invoke-Role -sides 20
 
     Write-Output "Rolled a $($playerRoll)"
     [int]$playerNewLocation = $playerLocation + $playerRoll
-    if ($ladderBottomLocations.'Location' -eq $playerNewLocation) {
+    if ($playerNewLocation -gt 100) {
+        Write-Output "Roll too high ($playerNewLocation)"
+        $playerLocation = $playerNewLocation - $playerRoll
+    }
+    elseif ($ladderBottomLocations.'Location' -eq $playerNewLocation) {
         $playerNewNewLocation = $ladderTopLocations | Where-Object { $_.'Location' -eq $playerNewLocation }
         Write-Output "Location: $playerNewLocation climb the ladder to $($playerNewNewLocation.'Exit')"
         $playerLocation = $playerNewNewLocation.'Exit'
-        Start-Sleep 2
+        Start-Sleep -seconds 1
     }
     elseif ($snakeHeadLocations.'Location' -eq $playerNewLocation) {
         $playerNewNewLocation = $snakeHeadLocations | Where-Object { $_.'Location' -eq $playerNewLocation }
         Write-Output "Location: $playerNewLocation slide down the snake to $($playerNewNewLocation.'Exit')"
         $playerLocation = $playerNewNewLocation.'Exit'
-        Start-Sleep 2
+        Start-Sleep -seconds 1
     }
     else {
         Write-Output "Location: $playerNewLocation"
         $playerLocation = $playerNewLocation
+        Start-Sleep -seconds 1
     }
 }
